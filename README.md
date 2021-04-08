@@ -12,12 +12,10 @@
 4. Nafis Chowdhury - nafis195@csu.fullerton.edu
 5. 
 <br>
-<br>
 
 
 ### Programming Language
 C++
-<br>
 <br>
 
 
@@ -35,16 +33,13 @@ C++
 * INPUT FILE: The file from which to read the input.
 * OUTPUT FILE: The file to which the output shall be written.
 <br>
-<br>
 
 
 ### Extra Credit
 None
 <br>
-<br>
 
 
 ### Other Notes
 None
-<br>
 <br>
