@@ -25,19 +25,15 @@ C++
 `./cipher <CIPHER NAME> <KEY> <ENC/DEC> <INPUTFILE> <OUTPUT FILE>`
 <br>
 * CIPHER NAME:
-  * PLF - Playfair
-  * RTS - Row Transposition
-  * RFC - Railfence
-  * VIG - Vigenre
-  * CES - Caesar
-<br>
-* KEY: the encryption key to use.
-<br>
-* ENC/DEC: whether to encrypt or decrypt, respectively.
-<br>
-* INPUT FILE: the file from which to read the input.
-<br>
-* OUTPUT FILE: the file to which the output shall be written.
+    * PLF - Playfair
+    * RTS - Row Transposition
+    * RFC - Railfence
+    * VIG - Vigenre
+    * CES - Caesar
+* KEY: the Encryption key to use.
+* ENC/DEC: Whether to encrypt or decrypt, respectively.
+* INPUT FILE: The file from which to read the input.
+* OUTPUT FILE: The file to which the output shall be written.
 <br>
 <br>
 
