@@ -1,175 +1,159 @@
+
 #include <iostream>
 #include <string>
 #include "RailFence.h"
 using namespace std;
 
-
-bool RailFence::setKey(const string& key)
-{
-    for (int i = 0; i < key.length(); i++)
-    {
-        if (!isdigit(key[i])) {
+// ==================================================================================
+bool RailFence::setKey(const string& mykey) {
+    // CHECK IF KEY IS VALID
+        //if key contains a num, returns false
+    for (int i = 0; i < mykey.length(); i++) {
+        if (!isdigit(mykey[i])) {
             return false;
         }
     }
 
-    int tempkey = stoi(key);
-    secretkey = tempkey;
+    // checkpoint is reached, key is valid
+    //cout << "Checkpoint: setKey";
+    int temp = stoi(key);
+
+    // save key into protected variable
+    secretkey = temp;
     return true;
 
 }
 
-string RailFence::encrypt(const string& plaintext)
-{
-    string output;
-    int len = round(plaintext.length() / secretkey);
-    int counter = 0;
-    char empty = ' ';
-    len++;
 
-    //create table
+// ==================================================================================
+string RailFence::encrypt(const string& plaintext) {
+    
+    //GET COLUMN VALUE
+    //round up to nearest int, ++1
+    int len = round(plaintext.length() / secretkey);
+    len++;
+    //len is now equal to num of columns needed for our rail fence
+
+    //CREATE RAIL FENCE (using a table)
     char** table = new char* [secretkey];
-    for (int i = 0; i < secretkey; ++i)
-    {
+    for (int i = 0; i < secretkey; ++i) {
         table[i] = new char[len];
     }
 
-    //empty the table
-    for (int row = 0; row < secretkey; row++)
-    {
-        for (int col = 0; col < len; col++)
-        {
-            table[row][col] = empty;
+    //EMPTY THE TABLE
+    char null = ' ';
+    for (int row = 0; row < secretkey; row++) {
+        for (int col = 0; col < len; col++) {
+            table[row][col] = null;
         }
     }
 
-    //encrypt
-    //fill table with inputs
-    for (int col = 0; col < len; col++)
-    {
-        for (int row = 0; row < secretkey; row++)
-        {
-            if (counter < plaintext.length())
-            {
-                char temp = plaintext.at(counter);
-                if (isalpha(temp))
-                {
-                    table[row][col] = temp;
-                    counter++;
+    //BEGIN ENCRYPTION (putting plaintext into rail fence table)
+    int temp = 0;
+    for (int col = 0; col < len; col++) {
+        for (int row = 0; row < secretkey; row++) {
+            
+            if (temp < plaintext.length()) {
+                char tableValue = plaintext.at(temp);
+                if (isalpha(tableValue)) {
+                    table[row][col] = tableValue;
+                    temp++;
                 }
-                else
-                {
-                    counter++;
+                else {
+                    temp++;
                     row--;
                 }
             }
         }
     }
 
-    //generate cipher text
-
-    for (int row = 0; row < secretkey; row++)
-    {
-        for (int col = 0; col < len; col++)
-        {
+    //RETRIEVE CIPHERTEXT (from rail fence)
+    string ciphertext;
+    for (int row = 0; row < secretkey; row++) {
+        for (int col = 0; col < len; col++) {
+            
             cout << table[row][col];
-            if (isalpha(table[row][col]))
-            {
-                output += table[row][col];
+            if (isalpha(table[row][col])) {
+                ciphertext += table[row][col];
             }
         }
-        cout << endl;
     }
-
-    return output;
+    return ciphertext;
 }
-string RailFence::decrypt(const string& ciphertext)
-{
-    string output;
-    string ciphertextcp = ciphertext;
+
+
+// ==================================================================================
+string RailFence::decrypt(const string& ciphertext) {
+    
+    //GET COLUMN VALUE
+    //round up to nearest int, ++1
     int len = round(ciphertext.length() / secretkey);
-    int counter = 0;
     len++;
-    char empty = ' ';
-    int* lettersPerRowArr;
-    lettersPerRowArr = new int[secretkey];
+
+    //RETRIEVE HOW MANY LEFTOVER LETTERS IN CIPHERTEXT (saves it to leftover)
+        // rowlengthArray will hold the length of every row in an array []
+        // lettersPerRow will hold the minimum length of all rows
+    int* rowLengthArray;    
+    rowLengthArray = new int[secretkey];
     int lettersPerRow = floor(ciphertext.length() / secretkey);
-    int leftover = ciphertext.length() % secretkey;
 
-    //remove all blank space from input
-    for (int i = 0; i < ciphertextcp.length(); i++)
-    {
-        if (ciphertextcp.at(i) == ' ')
-        {
-            ciphertextcp.erase(i, 1);
-            i--;
+    // update rowLengthArray to include leftover characters to the rows that have them
+    int extraCharCounter = ciphertext.length() % secretkey;
+    for (int i = 0; i < secretkey; i++) {
+        // does (lettersPerRow +1) to rowLengthArray if extraCharCounter is not zero
+        if (excessCharCounter != 0) {
+            rowLengthArray[i] = lettersPerRow + 1;
+            excessCharCounter--;
+        }
+        //else, rowLengthArray is the size of minimum length of all rows
+        else {
+            rowLengthArray[i] = lettersPerRow;
         }
     }
 
-    for (int i = 0; i < secretkey; i++)
-    {
-        if (leftover != 0)
-        {
-            lettersPerRowArr[i] = lettersPerRow + 1;
-            leftover--;
-        }
-        else
-        {
-            lettersPerRowArr[i] = lettersPerRow;
-        }
-        cout << lettersPerRowArr[i] << endl;
-
-    }
-    ////create table
+    //CREATE RAIL FENCE (using a table)
     char** table = new char* [secretkey];
-    for (int i = 0; i < secretkey; ++i)
-    {
+    for (int i = 0; i < secretkey; ++i) {
         table[i] = new char[len];
     }
 
-    //empty the table
-    for (int row = 0; row < secretkey; row++)
-    {
-        for (int col = 0; col < len; col++)
-        {
-            table[row][col] = empty;
+    //EMPTY THE TABLE
+    char null = ' ';
+    for (int row = 0; row < secretkey; row++) {
+        for (int col = 0; col < len; col++) {
+            table[row][col] = null;
         }
     }
 
-    //fill the table
-    for (int row = 0; row < secretkey; row++)
-    {
-        for (int col = 0; col < lettersPerRowArr[row]; col++)
-        {
-            if (counter < ciphertext.length())
-            {
-                char temp = ciphertext.at(counter);
-                if (isalpha(temp))
-                {
-                    table[row][col] = temp;
+    //BEGIN DECRYPTION (putting ciphertext into rail fence table)
+    int count = 0;
+    for (int row = 0; row < secretkey; row++) {
+        for (int col = 0; col < rowLengthArray[row]; col++) {
+
+            if (count < ciphertext.length()) {
+                char charHolder = ciphertext.at(count);
+                if (isalpha(charHolder)) {
+                    table[row][col] = charHolder;
                     cout << table[row][col];
-                    counter++;
+                    count++;
                 }
-                else
-                {
-                    counter++;
+                else {
+                    count++;
                     col--;
                 }
             }
         }
-        cout << endl;
     }
-    //generate plaintext
-    for (int col = 0; col < len; col++)
-    {
-        for (int row = 0; row < secretkey; row++)
-        {
-            if (isalpha(table[row][col]))
-            {
-                output += table[row][col];
+
+    //RETRIEVE PLAINTEXT (from rail fence)
+    string plaintext;
+    for (int col = 0; col < len; col++) {
+        for (int row = 0; row < secretkey; row++) {
+
+            if (isalpha(table[row][col])) {
+                plaintext += table[row][col];
             }
         }
     }
-
-    return output;
+    return plaintext;
 }
