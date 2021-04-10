@@ -10,46 +10,29 @@
 
 using namespace std;
 
-/**
- * This class implements the Vigenere cipher.
- * The class extends the abstract class
- * CipherInterface.
- */
+// This class implements the Vigenere cipher using an abstraction of the CipherInterface class
 
 class Vigenere : public CipherInterface
 {
-	/** The public members **/
+
 public:
 
-	/**
-	 * Sets the key to use
-	 * @param key - the key to use
-	 * @return - True if the key is valid and False otherwise
-	 */
+	// Checks if user inputted key is valid and sets it
 	virtual bool setKey(const string& key);
 
-	/**
-	 * Encrypts a plaintext string
-	 * @param plaintext - the plaintext string
-	 * @return - the encrypted ciphertext string
-	 */
+	//Encrypts a string of plaintext
 	virtual string encrypt(const string& plaintext);
 
-	/**
-	 * Decrypts a string of ciphertext
-	 * @param ciphertext - the ciphertext
-	 * @return - the plaintext
-	 */
+	//Decrypts a string of plaintext
 	virtual string decrypt(const string& ciphertext);
 
-	//makes the key as big or larger than the input
+	// increases the key size to be the same size or bigger than the input
 	virtual string checkkeysize(const string& input);
 
-	//determines the position of the passed in value in the
-	// alphavector or alphabet
-	virtual int findposition(string input, int startval);
+	// Finds the position of the passed value in the alphavector/alphabet
+	virtual int findpos(string input, int startval);
 
-	/* The protected members */
+
 protected:
 	string secretkey;
 
