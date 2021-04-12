@@ -1,417 +1,203 @@
-#include <iostream>
-#include<string>
-#include<math.h>
-#include<sstream>
 #include"Playfair.h"
 using namespace std;
 
-bool Playfair::setKey(const string& orikey)
+/**
+ * Sets the key to use
+ * @param key - the key to use
+ * @return - True if the key is valid and False otherwise
+ */
+bool Playfair::setKey(const string& key)
 {
-    cout << "inside setkey" << endl;
-    string key = orikey;
-    for (int i = 0; i < key.length(); i++) {
+    for (int i = 0; i < key.length(); i++)
+    {
         if (isdigit(key[i])) {
             return false;
         }
     }
-    //remove duplicate from key
-    string nodupekey;
-    int index = 0;
-
-    // Traverse through all characters 
-    for (int i = 0; i < key.length(); i++) {
-        int j;
-        // Check if key.at(i) is present before it      
-        for (j = 0; j < i; j++)
-        {
-            if (key.at(i) == key.at(j))
-                break;
-        }
-        // If not present, then add it to 
-        // result. 
-        if (j == i) {
-            nodupekey += key.at(i);
-        }
-    }
-
-    //build matrix and coordinate array
-    //coordinate[25];
-    matrix = new char* [5];
-    for (int i = 0; i < 5; i++)
-    {
-        matrix[i] = new char[5];
-    }
-
-    index = 0;
-    //insert key into matrix
-    for (int row = 0; row < 5; row++)
-    {
-        for (int col = 0; col < 5; col++)
-        {
-            if (index < nodupekey.length())
-            {
-                if (nodupekey.at(index) == 'i')
-                {
-                    nodupekey.at(index) = 'j';
-                }
-                matrix[row][col] = nodupekey.at(index);
-                index++;
-            }
-        }
-    }
-
-    //fill the rest of the matrix
-    char letter = 'a';
-    index = 0;
-    for (int row = 0; row < 5; row++)
-    {
-
-        for (int col = 0; col < 5; col++)
-        {
-            //replace i with j
-            if (letter == 'i')
-            {
-                letter = 'j';
-            }
-            //if letter is already in matrix
-            if (matrix[row][col] == letter)
-            {
-                stringstream ss1, ss2;
-                string temp_x, temp_y;
-                ss1 << row;
-                ss2 << col;
-                temp_x = ss1.str();
-                temp_y = ss2.str();
-
-                coordinate[index++] = temp_x + temp_y;
-
-                row = 0;
-                col = 0;
-                letter++;
-                if (matrix[row][col] == letter)
-                {
-                    stringstream ss1, ss2;
-                    string temp_x, temp_y;
-                    ss1 << row;
-                    ss2 << col;
-                    temp_x = ss1.str();
-                    temp_y = ss2.str();
-
-                    coordinate[index++] = temp_x + temp_y;
-
-
-                    row = 0;
-                    col = 0;
-                    letter++;
-                }
-            }
-            if (!isalpha(matrix[row][col]))
-            {
-                stringstream ss1, ss2;
-                string temp_x, temp_y;
-                ss1 << row;
-                ss2 << col;
-                temp_x = ss1.str();
-                temp_y = ss2.str();
-
-                coordinate[index++] = temp_x + temp_y;
-
-                matrix[row][col] = letter;
-                row = 0;
-                col = 0;
-                letter++;
-                if (matrix[row][col] == letter)
-                {
-                    stringstream ss1, ss2;
-                    string temp_x, temp_y;
-                    ss1 << row;
-                    ss2 << col;
-                    temp_x = ss1.str();
-                    temp_y = ss2.str();
-
-                    coordinate[index++] = temp_x + temp_y;
-
-                    row = 0;
-                    col = 0;
-                    letter++;
-                }
-            }
-        }
-    }
-
-
-    for (int i = 0; i < 25; i++)
-    {
-        cout << coordinate[i] << " ";
-    }
-    cout << endl;
-
-    //print matrix
-    for (int row = 0; row < 5; row++)
-    {
-        for (int col = 0; col < 5; col++)
-        {
-            cout << matrix[row][col];
-        }
-        cout << endl;
-    }
-
-    cout << endl;
-
-    cout << "At end of setkey" << endl;
-
+    cipherKey = key;
     return true;
 }
 
-///////////////////////////////////////////////////////////////
-string Playfair::encrypt(const string& plaintext)
+/**
+ * Encrypts a plaintext string
+ * @param plaintext - the plaintext string
+ * @return - the encrypted ciphertext string
+ */
+string Playfair::encrypt(const string& message)
 {
-    //cout << "starting encrypt" << endl;
-    string input = plaintext;
-    string output;
-    int index = 0;
-    while (index < input.length())
+    //Generating the matrix
+    //flag indicates if letter is in matrix already
+    int flag[26] = { 0 };
+    int x = 0, y = 0;
+
+    //Add key letters to the matrix
+    for (int i = 0; i < cipherKey.length(); i++)
     {
-        //cout << "001" << endl;
-        //break input into letters pair
-        char letter1, letter2, x, y;
-        int x1, x2, y1, y2, letter1Index, letter2Index;
-        string letter1Coordinate, letter2Coordinate;
-        letter1 = input.at(index++);
-        if (index != input.length())
+        //change letter j to i
+        if (cipherKey[i] == 'j') cipherKey[i] = 'i';
+
+        if (flag[cipherKey[i] - 'a'] == 0)
         {
-            letter2 = input.at(index++);
+            matrix[x][y++] = cipherKey[i];
+            flag[cipherKey[i] - 'a'] = 1;
         }
-        else
+        else if (y == 5) x++, y = 0;
+    }
+
+    //Add rest of letters to the matrix except j since replaced with i
+    // if flag = 0, letter is not in matrix
+    // if flag = 1, letter is present in matrix
+    for (char let = 'a'; let <= 'z'; let++)
+    {
+        if (let == 'j') continue;
+
+        if (flag[let - 'a'] == 0)
         {
-            letter2 = 'x';
+            matrix[x][y++] = let;
+            flag[let - 'a'] = 1;
         }
+        if (y == 5) x++, y = 0;
+    }
+        
+    //message formatting
+    string formMsg = message;
+    for (int i = 0; i < formMsg.length(); i++)
+    {
+        if (formMsg[i] == 'j')  formMsg[i] = 'i';
+    }
 
-        //cout << "002" << endl;
-        //if letter = i change it to j
-        if (letter1 == 'i')
-        {
-            letter1 = 'j';
-        }
-        if (letter2 == 'i')
-        {
-            letter2 = 'j';
-        }
+    //pairing two letters
+    for (int i = 1; i < formMsg.length(); i += 2)
+    {
+        if (formMsg[i - 1] == formMsg[i])  formMsg.insert(i, "x");
+    }
 
-        //cout << "003" << endl;
-        //check for same consecutive letters
-        if (letter1 == letter2)
-        {
-            letter2 = 'x';
-            index--;
-        }
+    if (formMsg.length() % 2 != 0)  formMsg += "x";
+    
+    string cipherText = "";
+    int x1 = 0;
+    int x2 = 0;
+    int y1 = 0;
+    int y2 = 0;
 
-        cout << letter1 << "\t" << letter2 << endl;
-        //cout << "004" << endl;
-        //convert letter into indexes
-        letter1Index = (int)letter1 - 97;
-        letter2Index = (int)letter2 - 97;
-
-        if (letter1Index > 8)
-        {
-            letter1Index--;
-        }
-        if (letter2Index > 8)
-        {
-            letter2Index--;
-        }
-        cout << letter1Index << "\t" << letter2Index << endl;
-        //cout << "005" << endl;
-        //get coordinate pair from array
-        letter1Coordinate = coordinate[letter1Index];
-        letter2Coordinate = coordinate[letter2Index];
-
-        cout << letter1Coordinate << "\t" << letter2Coordinate << endl;
-        //break coordinate pair into x,y
-
-        x = letter1Coordinate.at(0);
-        y = letter1Coordinate.at(1);
-
-        x1 = (int)x - 48;
-        y1 = (int)y - 48;
-
-        x = letter2Coordinate.at(0);
-        y = letter2Coordinate.at(1);
-
-        x2 = (int)x - 48;
-        y2 = (int)y - 48;
-
-        cout << x1 << "," << y1 << "\t" << x2 << "," << y2 << endl;
-
-        //cout << "006" << endl;
-        //////////////////////////////////////////////////////////////////
-        //encrypt
-        //check if letter pair is on the same row
+    //check for pair values
+    for (int i = 0; i < formMsg.length(); i += 2)
+    {
+        for (int j = 0; j < 5; j++)
+            for (int k = 0; k < 5; k++)
+                if (formMsg[i] == matrix[j][k])
+                {
+                    x1 = j;
+                    y1 = k;
+                }
+        for (int j = 0; j < 5; j++)
+            for (int k = 0; k < 5; k++)
+                if (formMsg[i+1] == matrix[j][k])
+                {
+                    x2 = j;
+                    y2 = k;
+                }
+       
+        //identical row
         if (x1 == x2)
         {
-            y1 += 1;
-            y2 += 1;
-            if (y1 > 4)
-            {
-                y1 = 0;
-            }
-            if (y2 > 4)
-            {
-                y2 = 0;
-            }
-            output += matrix[x1][y1];
-            output += matrix[x2][y2];
+            cipherText += matrix[x1][(y1 + 1) % 5];
+            cipherText += matrix[x2][(y2 + 1) % 5];
         }
-
-        //check if letter pair  is on the same col
+        //identical column
         else if (y1 == y2)
         {
-            //cout << "007" << endl;
-            x1 += 1;
-            x2 += 1;
-
-            if (x1 > 4)
-            {
-                x1 = 0;
-            }
-            if (x2 > 4)
-            {
-                x2 = 0;
-            }
-            output += matrix[x1][y1];
-            output += matrix[x2][y2];
+            cipherText += matrix[(x1 + 1) % 5][y1];
+            cipherText += matrix[(x2 + 1) % 5][y2];
         }
         else
         {
-            output += matrix[x1][y2];
-            output += matrix[x2][y1];
+            cipherText += matrix[x1][y2];
+            cipherText += matrix[x2][y1];
         }
     }
-    //cout << "008" << endl;
-    return output;
+    return cipherText;
 }
 
-string Playfair::decrypt(const string& plaintext)
+/**
+ * Decrypts a string of ciphertext
+ * @param cipherText - the ciphertext
+ * @return - the plaintext
+ */
+string Playfair::decrypt(const string& message)
 {
-    string input = plaintext;
-    string output;
-    int index = 0;
-    while (index < input.length())
+    int flag[26] = { 0 };
+    int x = 0, y = 0;
+
+    //Add key letters to matrix
+    for (int i = 0; i < cipherKey.length(); i++)
     {
-        //break input into letters pair
-        char letter1, letter2, x, y;
-        int x1, x2, y1, y2, letter1Index, letter2Index;
-        string letter1Coordinate, letter2Coordinate;
-        letter1 = input.at(index++);
-        if (index != input.length())
+        //change letter j to i
+        if (cipherKey[i] == 'j') cipherKey[i] = 'i';
+
+        if (flag[cipherKey[i] - 'a'] == 0)
         {
-            letter2 = input.at(index++);
+            matrix[x][y++] = cipherKey[i];
+            flag[cipherKey[i] - 'a'] = 1;
         }
-        else
+        if (y == 5) x++, y = 0;
+    }
+
+    //Add the rest of the letters except j since replaced with i
+    for (char let = 'a'; let <= 'z'; let++)
+    {
+        if (let == 'j') continue;
+
+        if (flag[let - 'a'] == 0)
         {
-            letter2 = 'x';
+            matrix[x][y++] = let;
+            flag[let - 'a'] = 1;
         }
+        if (y == 5) x++, y = 0;
+    }
 
+    string plainText = "";
+    string formMsg = message;
+    int x1 = 0;
+    int x2 = 0;
+    int y1 = 0;
+    int y2 = 0;
 
-        //if letter = i change it to j
-        if (letter1 == 'i')
-        {
-            letter1 = 'j';
-        }
-        if (letter2 == 'i')
-        {
-            letter2 = 'j';
-        }
+    //check for pair values
+    for (int i = 0; i < formMsg.length(); i += 2)
+    {
+        for (int j = 0; j < 5; j++)
+            for (int k = 0; k < 5; k++)
+                if (formMsg[i] == matrix[j][k])
+                {
+                    x1 = j;
+                    y1 = k;
+                }
+        for (int j = 0; j < 5; j++)
+            for (int k = 0; k < 5; k++)
+                if (formMsg[i + 1] == matrix[j][k])
+                {
+                    x2 = j;
+                    y2 = k;
+                }
 
-
-        //check for same consecutive letters
-        if (letter1 == letter2)
-        {
-            letter2 = 'x';
-            index--;
-        }
-
-        //cout<< letter1<< "\t" <<letter2<<endl;
-
-        //convert letter into indexes
-        letter1Index = (int)letter1 - 97;
-        letter2Index = (int)letter2 - 97;
-
-        if (letter1Index > 8)
-        {
-            letter1Index--;
-        }
-        if (letter2Index > 8)
-        {
-            letter2Index--;
-        }
-        //cout << letter1Index << "\t" << letter2Index << endl;
-
-        //get coordinate pair from array
-        letter1Coordinate = coordinate[letter1Index];
-        letter2Coordinate = coordinate[letter2Index];
-
-        //cout << letter1Coordinate << "\t" << letter2Coordinate << endl;
-        //break coordinate pair into x,y
-
-        x = letter1Coordinate.at(0);
-        y = letter1Coordinate.at(1);
-
-        x1 = (int)x - 48;
-        y1 = (int)y - 48;
-
-        x = letter2Coordinate.at(0);
-        y = letter2Coordinate.at(1);
-
-        x2 = (int)x - 48;
-        y2 = (int)y - 48;
-
-        //cout << x1 << "," << y1 << "\t" << x2 << "," << y2 << endl;  
-
-        /////////////////////////////////////////////////////////////////
-        //decrypt
-
-          //check if letter pair is on the same row
+        //identical row
         if (x1 == x2)
         {
-            y1 -= 1;
-            y2 -= 1;
-            if (y1 < 0)
-            {
-                y1 = 4;
-            }
-            if (y2 < 0)
-            {
-                y2 = 4;
-            }
-            output += matrix[x1][y1];
-            output += matrix[x2][y2];
+            plainText += matrix[x1][--y1 < 0 ? 4 : y1];
+            plainText += matrix[x2][--y2 < 0 ? 4 : y2];
         }
-
-        //check if letter pair  is on the same col
+        //identical column
         else if (y1 == y2)
         {
-            x1 -= 1;
-            x2 -= 1;
-
-            if (x1 < 0)
-            {
-                x1 = 4;
-            }
-            if (x2 < 0)
-            {
-                x2 = 4;
-            }
-            output += matrix[x1][y1];
-            output += matrix[x2][y2];
+            plainText += matrix[--x1 < 0 ? 4 : x1][y1];
+            plainText += matrix[--x2 < 0 ? 4 : x2][y2];
         }
         else
         {
-            output += matrix[x1][y2];
-            output += matrix[x2][y1];
+            plainText += matrix[x1][y2];
+            plainText += matrix[x2][y1];
         }
-
     }
-    return output;
+    return plainText;
 }
-
