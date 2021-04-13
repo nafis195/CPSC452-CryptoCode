@@ -57,19 +57,15 @@ int main(int argc, char** argv)
 		}
 
 		// Setting the encryption key
-		cout << "setting the key" << endl;
+
 		cipher->setKey(keyInput);
-		cout << "key should be set" << endl;
+
 
 		if (funcType == "ENC")
 		{
-			cout << "doing encryption1" << endl;
-			cout << input << endl;
 
 			// Performing encryption
 			input = cipher->encrypt(input);
-			cout << input << endl;
-			cout << "after encryption1" << endl;
 		}
 		if (funcType == "DEC")
 		{
@@ -98,7 +94,6 @@ int main(int argc, char** argv)
 
 		if (funcType == "ENC")
 		{
-			cout << "doing encryption2" << endl;
 			// Performing encryption
 			input = cipher->encrypt(input);
 		}
@@ -188,7 +183,6 @@ int main(int argc, char** argv)
 
 		if (funcType == "ENC")
 		{
-			cout << "doing encryption5" << endl;
 			// Performing encryption
 			input = cipher->encrypt(input);
 		}
