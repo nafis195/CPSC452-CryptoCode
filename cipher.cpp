@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 		// Error checks
 		if (!cipher)
 		{
-			fprintf(stderr, "ERROR\n",
+			fprintf(stderr, "ERROR[%s %s %d] \n",
 				__FILE__, __FUNCTION__, __LINE__);
 			exit(-1);
 		}
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 		// Error checks
 		if (!cipher)
 		{
-			fprintf(stderr, "ERROR\n",
+			fprintf(stderr, "ERROR[%s %s %d] \n",
 				__FILE__, __FUNCTION__, __LINE__);
 			exit(-1);
 		}
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
 		// Error checks
 		if (!cipher)
 		{
-			fprintf(stderr, "ERROR\n",
+			fprintf(stderr, "ERROR[%s %s %d] \n",
 				__FILE__, __FUNCTION__, __LINE__);
 			exit(-1);
 		}
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
 		// Error checks
 		if (!cipher)
 		{
-			fprintf(stderr, "ERROR\n",
+			fprintf(stderr, "ERROR[%s %s %d] \n",
 				__FILE__, __FUNCTION__, __LINE__);
 			exit(-1);
 		}
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 		// Error checks
 		if (!cipher)
 		{
-			fprintf(stderr, "ERROR\n",
+			fprintf(stderr, "ERROR[%s %s %d] \n",
 				__FILE__, __FUNCTION__, __LINE__);
 			exit(-1);
 		}
